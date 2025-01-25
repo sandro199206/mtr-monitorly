@@ -4,18 +4,34 @@ import TraceResults from "@/components/TraceResults";
 import LatencyChart from "@/components/LatencyChart";
 import { HopData } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Temporary mock data for demonstration
-const mockTrace = (target: string): HopData[] => {
+// Mock servers data
+const SERVERS = [
+  { id: "us-west", name: "US West (San Francisco)" },
+  { id: "us-east", name: "US East (New York)" },
+  { id: "eu-central", name: "EU Central (Frankfurt)" },
+  { id: "ap-east", name: "AP East (Tokyo)" },
+];
+
+// Temporary mock data for demonstration with server-specific latency patterns
+const mockTrace = (target: string, serverId: string): HopData[] => {
+  const baseLatency = {
+    "us-west": 20,
+    "us-east": 25,
+    "eu-central": 35,
+    "ap-east": 45,
+  }[serverId] || 30;
+
   return Array.from({ length: 8 }, (_, i) => ({
     hop: i + 1,
-    host: i === 7 ? target : `router-${i + 1}.net`,
+    host: i === 7 ? target : `${serverId}-router-${i + 1}.net`,
     loss: Math.random() * 5,
     sent: 10,
-    last: 20 + Math.random() * 30,
-    avg: 25 + Math.random() * 20,
-    best: 15 + Math.random() * 10,
-    worst: 40 + Math.random() * 20,
+    last: baseLatency + (i * 5) + Math.random() * 30,
+    avg: baseLatency + (i * 5) + Math.random() * 20,
+    best: baseLatency + (i * 5) + Math.random() * 10,
+    worst: baseLatency + (i * 5) + Math.random() * 40,
     stdev: 2 + Math.random() * 3,
   }));
 };
@@ -23,12 +39,13 @@ const mockTrace = (target: string): HopData[] => {
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<HopData[]>([]);
+  const [selectedServer, setSelectedServer] = useState(SERVERS[0].id);
 
   const handleTrace = async (target: string) => {
     setIsLoading(true);
-    // Simulate network request
+    // Simulate network request with the selected server
     setTimeout(() => {
-      const data = mockTrace(target);
+      const data = mockTrace(target, selectedServer);
       setResults(data);
       setIsLoading(false);
     }, 2000);
@@ -43,8 +60,29 @@ const Index = () => {
           <CardHeader>
             <CardTitle>New Trace</CardTitle>
           </CardHeader>
-          <CardContent>
-            <MtrForm onSubmit={handleTrace} isLoading={isLoading} />
+          <CardContent className="space-y-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="w-full sm:w-48">
+                <Select
+                  value={selectedServer}
+                  onValueChange={setSelectedServer}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select server" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SERVERS.map((server) => (
+                      <SelectItem key={server.id} value={server.id}>
+                        {server.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1">
+                <MtrForm onSubmit={handleTrace} isLoading={isLoading} />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
