@@ -13,7 +13,7 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-export const db = new Database(dbPath);
+const db = new Database(dbPath);
 
 // Enable foreign keys
 db.pragma('foreign_keys = ON');
@@ -81,4 +81,5 @@ export function initDatabase() {
   console.log('✅ Database initialized successfully');
 }
 
+export { db };
 export default db;
