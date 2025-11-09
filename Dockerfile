@@ -6,11 +6,12 @@ FROM node:20-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy package files (both package.json and package-lock.json explicitly)
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm ci
+# Use npm install instead of npm ci as a fallback if package-lock.json has issues
+RUN npm install --frozen-lockfile || npm install
 
 # Copy source code
 COPY . .
