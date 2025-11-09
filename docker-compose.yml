@@ -19,28 +19,39 @@ services:
       retries: 3
       start_period: 40s
 
-  # Backend service (placeholder - implement your MTR backend here)
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: mtr-monitoring-backend
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - NODE_ENV=production
-  #   restart: unless-stopped
-  #   networks:
-  #     - mtr-network
-  #   # Required capabilities for running MTR command
-  #   cap_add:
-  #     - NET_RAW
-  #     - NET_ADMIN
+  # Backend API service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mtr-monitoring-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET:-change-this-in-production}
+      - PORT=3000
+    volumes:
+      - mtr-data:/app/data
+    restart: unless-stopped
+    networks:
+      - mtr-network
+    # Required capabilities for running MTR command via SSH
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 networks:
   mtr-network:
     driver: bridge
 
-# Optional: Add volumes for persistent data
-# volumes:
-#   mtr-data:
+# Persistent storage for database
+volumes:
+  mtr-data:
+    driver: local
