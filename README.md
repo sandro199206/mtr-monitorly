@@ -1,31 +1,46 @@
 # MTR Monitoring Web App 🌐
 
-Eine moderne Web-Anwendung zur Überwachung und Analyse von Netzwerk-Traces mit MTR (My Traceroute). Visualisiert Latenz, Paketverlust und Netzwerk-Hops in einer benutzerfreundlichen Oberfläche.
+Eine vollständige Web-Anwendung zur Überwachung und Analyse von Netzwerk-Traces mit MTR (My Traceroute). Mit Backend-System für echte SSH-basierte MTR-Ausführung auf Remote-Servern.
 
 ## ✨ Features
 
-- 🔍 **MTR Trace Ausführung** von verschiedenen Server-Standorten
+### Frontend
+- 🔐 **User Authentication** - Login/Registrierung mit JWT
+- 🖥️ **Server Management** - CRUD für SSH-Server-Konfiguration
 - 📊 **Interaktive Latenz-Charts** mit Recharts
 - 📈 **Detaillierte Hop-Analyse** mit Paketlust-Statistiken
+- 📜 **Trace History** - Gespeicherte Messungen einsehen
+- 💾 **Export-Funktionen** - CSV/JSON Download
 - 🎨 **Modernes UI** mit shadcn/ui und Tailwind CSS
-- 🔒 **TypeScript** für Type-Safety
-- 🚀 **Optimierte Performance** mit React.memo und useMemo
 - ♿ **Accessibility-Features** (ARIA-Labels, Semantic HTML)
-- 🐳 **Docker-Ready** für einfaches Deployment
-- 🛡️ **Error Boundaries** für robuste Fehlerbehandlung
-- ✅ **Input-Validierung** für Hostnames und IP-Adressen
+
+### Backend
+- 🔌 **SSH Integration** - Remote MTR-Ausführung via SSH2
+- 🌍 **Multi-Server Support** - Von mehreren Servern gleichzeitig messen
+- 🗄️ **SQLite Datenbank** - Users, Server, Trace-History
+- 🔒 **JWT Authentication** - Sichere Benutzer-Accounts
+- 📦 **RESTful API** - Dokumentierte Endpoints
+- 🐳 **Docker-Ready** - Komplettes Container-Setup
 
 ## 🏗️ Technologie-Stack
 
-- **Frontend Framework:** React 18
+### Frontend
+- **Framework:** React 18 with TypeScript (Strict Mode)
 - **Build Tool:** Vite
-- **Sprache:** TypeScript (Strict Mode)
-- **UI-Bibliothek:** shadcn/ui
-- **Styling:** Tailwind CSS
+- **UI:** shadcn/ui + Tailwind CSS
 - **Charts:** Recharts
-- **State Management:** React Query (TanStack Query)
-- **Form Handling:** React Hook Form + Zod
+- **State:** React Query (TanStack Query)
 - **Routing:** React Router v6
+- **Auth:** JWT with Context API
+
+### Backend
+- **Runtime:** Node.js 20
+- **Framework:** Express.js
+- **Language:** TypeScript
+- **Database:** SQLite (better-sqlite3)
+- **SSH:** ssh2
+- **Auth:** JWT (jsonwebtoken)
+- **Validation:** Zod
 
 ## 📋 Voraussetzungen
 
@@ -60,19 +75,28 @@ npm run build
 npm run preview
 ```
 
-## 🐳 Docker Deployment
+## 🐳 Docker Deployment (Empfohlen)
 
 **Schnellstart mit Docker:**
 
 ```bash
-# Container bauen und starten
-docker-compose up -d
+# 1. Umgebungsvariablen setzen
+export JWT_SECRET="your-super-secret-jwt-key-$(openssl rand -hex 32)"
 
-# Logs anzeigen
-docker-compose logs -f
+# 2. Container bauen und starten
+docker compose up -d
 
-# App ist unter http://localhost verfügbar
+# 3. Logs verfolgen
+docker compose logs -f
+
+# 4. App öffnen: http://localhost
+# 5. Account erstellen und Server konfigurieren
 ```
+
+**Was wird gestartet:**
+- Frontend (Nginx auf Port 80)
+- Backend API (Port 3000, proxied durch Nginx)
+- SQLite Datenbank (persistent in Volume)
 
 **Detaillierte Deployment-Anleitung:** Siehe [DEPLOYMENT.md](./DEPLOYMENT.md)
 
