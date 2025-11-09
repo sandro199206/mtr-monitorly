@@ -1,6 +1,7 @@
 /**
  * Type definitions for MTR Monitoring Backend
  */
+import { Request } from 'express';
 
 export interface User {
   id: number;
@@ -50,7 +51,7 @@ export interface HopData {
   stdev: number;
 }
 
-export interface AuthRequest extends Express.Request {
+export interface AuthRequest extends Request {
   user?: {
     id: number;
     username: string;
