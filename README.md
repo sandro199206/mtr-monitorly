@@ -1,69 +1,226 @@
-# Welcome to your Lovable project
+# MTR Monitoring Web App 🌐
 
-## Project info
+Eine moderne Web-Anwendung zur Überwachung und Analyse von Netzwerk-Traces mit MTR (My Traceroute). Visualisiert Latenz, Paketverlust und Netzwerk-Hops in einer benutzerfreundlichen Oberfläche.
 
-**URL**: https://lovable.dev/projects/9006dec5-ed96-446f-ab62-2d0a5dda3cd7
+## ✨ Features
 
-## How can I edit this code?
+- 🔍 **MTR Trace Ausführung** von verschiedenen Server-Standorten
+- 📊 **Interaktive Latenz-Charts** mit Recharts
+- 📈 **Detaillierte Hop-Analyse** mit Paketlust-Statistiken
+- 🎨 **Modernes UI** mit shadcn/ui und Tailwind CSS
+- 🔒 **TypeScript** für Type-Safety
+- 🚀 **Optimierte Performance** mit React.memo und useMemo
+- ♿ **Accessibility-Features** (ARIA-Labels, Semantic HTML)
+- 🐳 **Docker-Ready** für einfaches Deployment
+- 🛡️ **Error Boundaries** für robuste Fehlerbehandlung
+- ✅ **Input-Validierung** für Hostnames und IP-Adressen
 
-There are several ways of editing your application.
+## 🏗️ Technologie-Stack
 
-**Use Lovable**
+- **Frontend Framework:** React 18
+- **Build Tool:** Vite
+- **Sprache:** TypeScript (Strict Mode)
+- **UI-Bibliothek:** shadcn/ui
+- **Styling:** Tailwind CSS
+- **Charts:** Recharts
+- **State Management:** React Query (TanStack Query)
+- **Form Handling:** React Hook Form + Zod
+- **Routing:** React Router v6
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9006dec5-ed96-446f-ab62-2d0a5dda3cd7) and start prompting.
+## 📋 Voraussetzungen
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js 20+ und npm
+- Docker & Docker Compose (für Container-Deployment)
 
-**Use your preferred IDE**
+## 🚀 Schnellstart
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Lokale Entwicklung
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+# Repository klonen
+git clone <repository-url>
+cd mtr-monitorly
 
-Follow these steps:
+# Dependencies installieren
+npm install
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Development Server starten
 npm run dev
+
+# App öffnet sich auf http://localhost:8080
 ```
 
-**Edit a file directly in GitHub**
+### Production Build
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+# Build erstellen
+npm run build
 
-**Use GitHub Codespaces**
+# Build lokal testen
+npm run preview
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🐳 Docker Deployment
 
-## What technologies are used for this project?
+**Schnellstart mit Docker:**
 
-This project is built with .
+```bash
+# Container bauen und starten
+docker-compose up -d
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+# Logs anzeigen
+docker-compose logs -f
 
-## How can I deploy this project?
+# App ist unter http://localhost verfügbar
+```
 
-Simply open [Lovable](https://lovable.dev/projects/9006dec5-ed96-446f-ab62-2d0a5dda3cd7) and click on Share -> Publish.
+**Detaillierte Deployment-Anleitung:** Siehe [DEPLOYMENT.md](./DEPLOYMENT.md)
 
-## I want to use a custom domain - is that possible?
+Die Deployment-Dokumentation enthält:
+- Schritt-für-Schritt Server-Setup
+- SSL/HTTPS-Konfiguration
+- Nginx-Optimierungen
+- Monitoring & Logging
+- Troubleshooting-Guide
+- Backup-Strategien
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## 📁 Projektstruktur
+
+```
+mtr-monitorly/
+├── src/
+│   ├── components/          # React-Komponenten
+│   │   ├── ErrorBoundary.tsx
+│   │   ├── LatencyChart.tsx
+│   │   ├── MtrForm.tsx
+│   │   └── TraceResults.tsx
+│   ├── lib/                 # Utilities & Helpers
+│   │   ├── constants.ts     # App-Konstanten
+│   │   ├── validation.ts    # Input-Validierung
+│   │   ├── mockData.ts      # Mock-Daten für Dev
+│   │   ├── queryClient.ts   # React Query Setup
+│   │   ├── types.ts         # TypeScript-Typen
+│   │   └── utils.ts         # Helper-Funktionen
+│   ├── pages/               # Page-Komponenten
+│   │   └── Index.tsx
+│   ├── App.tsx              # Root-Komponente
+│   └── main.tsx             # Entry Point
+├── public/                  # Statische Assets
+├── Dockerfile               # Docker-Image-Definition
+├── docker-compose.yml       # Docker Compose Config
+├── nginx.conf               # Nginx-Konfiguration
+├── .env.example             # Environment-Variablen Beispiel
+└── DEPLOYMENT.md            # Deployment-Guide
+```
+
+## ⚙️ Umgebungsvariablen
+
+Erstelle eine `.env`-Datei basierend auf `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Verfügbare Variablen:
+
+```bash
+# API Configuration
+VITE_API_BASE_URL=http://localhost:3000/api
+
+# Application Configuration
+VITE_APP_TITLE=MTR Monitoring
+VITE_APP_VERSION=1.0.0
+```
+
+## 🧪 Code-Qualität
+
+### Linting
+
+```bash
+npm run lint
+```
+
+### Build für verschiedene Umgebungen
+
+```bash
+# Production Build
+npm run build
+
+# Development Build (mit Source Maps)
+npm run build:dev
+```
+
+## 📊 Code-Verbesserungen
+
+Das Projekt wurde umfassend optimiert:
+
+✅ **TypeScript Strict Mode** aktiviert
+✅ **Input-Validierung** mit Regex für Hostnames/IPs
+✅ **Error Boundaries** für robuste Fehlerbehandlung
+✅ **Performance-Optimierungen** (useMemo, useCallback)
+✅ **Accessibility** (ARIA-Labels, semantisches HTML)
+✅ **JSDoc-Kommentare** für bessere Dokumentation
+✅ **Query Client** als Singleton
+✅ **React.StrictMode** für besseres Debugging
+✅ **Konstanten ausgelagert** für Wartbarkeit
+✅ **Mock-Daten separiert** für klare Struktur
+
+## 🔧 Entwicklung
+
+### Projektrichtlinien
+
+- **TypeScript:** Strikte Typisierung verwenden
+- **Komponenten:** Funktionale Komponenten mit Hooks
+- **Styling:** Tailwind CSS Utility Classes
+- **State:** React Query für Server-State, useState für UI-State
+- **Validierung:** Zod-Schemas für Formulare
+
+### Neue Features hinzufügen
+
+1. Komponenten in `src/components/` erstellen
+2. Types in `src/lib/types.ts` definieren
+3. Konstanten in `src/lib/constants.ts` hinzufügen
+4. JSDoc-Kommentare schreiben
+5. Error Handling implementieren
+
+## 🚢 Deployment-Optionen
+
+1. **Docker (Empfohlen):** `docker-compose up -d`
+2. **Netlify/Vercel:** Git-basiertes Deployment
+3. **Manuell:** Build auf Nginx/Apache Server
+4. **Lovable:** [Direkt von Lovable deployen](https://lovable.dev/projects/9006dec5-ed96-446f-ab62-2d0a5dda3cd7)
+
+Details siehe [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+## 🐛 Troubleshooting
+
+### Port bereits belegt
+```bash
+# Port in vite.config.ts ändern oder Docker-Port anpassen
+```
+
+### Build-Fehler
+```bash
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+### Docker-Probleme
+```bash
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+## 📝 Lizenz
+
+Dieses Projekt wurde mit [Lovable](https://lovable.dev) erstellt.
+
+## 🤝 Contribution
+
+Contributions sind willkommen! Bitte erstelle einen Pull Request oder öffne ein Issue.
+
+---
+
+**Projekt-URL:** https://lovable.dev/projects/9006dec5-ed96-446f-ab62-2d0a5dda3cd7

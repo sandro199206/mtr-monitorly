@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -12,7 +13,24 @@ interface TraceResultsProps {
   hops: HopData[];
 }
 
+/**
+ * Component displaying detailed MTR trace results in a table format
+ * Shows all hop metrics including latency and packet loss statistics
+ */
 const TraceResults = ({ hops }: TraceResultsProps) => {
+  // Memoize formatted rows for performance
+  const formattedHops = useMemo(() => {
+    return hops.map((hop) => ({
+      ...hop,
+      lossFormatted: `${hop.loss.toFixed(1)}%`,
+      lastFormatted: `${hop.last.toFixed(2)} ms`,
+      avgFormatted: `${hop.avg.toFixed(2)} ms`,
+      bestFormatted: `${hop.best.toFixed(2)} ms`,
+      worstFormatted: `${hop.worst.toFixed(2)} ms`,
+      stdevFormatted: hop.stdev.toFixed(2),
+    }));
+  }, [hops]);
+
   if (!hops.length) return null;
 
   return (
@@ -32,17 +50,19 @@ const TraceResults = ({ hops }: TraceResultsProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {hops.map((hop) => (
+          {formattedHops.map((hop) => (
             <TableRow key={hop.hop}>
-              <TableCell>{hop.hop}</TableCell>
-              <TableCell>{hop.host}</TableCell>
-              <TableCell>{hop.loss.toFixed(1)}%</TableCell>
+              <TableCell className="font-medium">{hop.hop}</TableCell>
+              <TableCell className="font-mono text-sm">{hop.host}</TableCell>
+              <TableCell className={hop.loss > 1 ? "text-destructive font-semibold" : ""}>
+                {hop.lossFormatted}
+              </TableCell>
               <TableCell>{hop.sent}</TableCell>
-              <TableCell>{hop.last.toFixed(2)} ms</TableCell>
-              <TableCell>{hop.avg.toFixed(2)} ms</TableCell>
-              <TableCell>{hop.best.toFixed(2)} ms</TableCell>
-              <TableCell>{hop.worst.toFixed(2)} ms</TableCell>
-              <TableCell>{hop.stdev.toFixed(2)}</TableCell>
+              <TableCell>{hop.lastFormatted}</TableCell>
+              <TableCell className="font-medium">{hop.avgFormatted}</TableCell>
+              <TableCell className="text-green-600 dark:text-green-400">{hop.bestFormatted}</TableCell>
+              <TableCell className="text-red-600 dark:text-red-400">{hop.worstFormatted}</TableCell>
+              <TableCell>{hop.stdevFormatted}</TableCell>
             </TableRow>
           ))}
         </TableBody>
