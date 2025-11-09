@@ -1,61 +1,71 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import MtrForm from "@/components/MtrForm";
 import TraceResults from "@/components/TraceResults";
 import LatencyChart from "@/components/LatencyChart";
 import { HopData } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { SERVERS, ServerId, TIMING } from "@/lib/constants";
+import { generateMockTrace } from "@/lib/mockData";
+import { toast } from "sonner";
 
-// Mock servers data
-const SERVERS = [
-  { id: "us-west", name: "US West (San Francisco)" },
-  { id: "us-east", name: "US East (New York)" },
-  { id: "eu-central", name: "EU Central (Frankfurt)" },
-  { id: "ap-east", name: "AP East (Tokyo)" },
-];
-
-// Temporary mock data for demonstration with server-specific latency patterns
-const mockTrace = (target: string, serverId: string): HopData[] => {
-  const baseLatency = {
-    "us-west": 20,
-    "us-east": 25,
-    "eu-central": 35,
-    "ap-east": 45,
-  }[serverId] || 30;
-
-  return Array.from({ length: 8 }, (_, i) => ({
-    hop: i + 1,
-    host: i === 7 ? target : `${serverId}-router-${i + 1}.net`,
-    loss: Math.random() * 5,
-    sent: 10,
-    last: baseLatency + (i * 5) + Math.random() * 30,
-    avg: baseLatency + (i * 5) + Math.random() * 20,
-    best: baseLatency + (i * 5) + Math.random() * 10,
-    worst: baseLatency + (i * 5) + Math.random() * 40,
-    stdev: 2 + Math.random() * 3,
-  }));
-};
-
+/**
+ * Main page component for MTR monitoring application
+ * Handles trace execution, server selection, and results display
+ */
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<HopData[]>([]);
-  const [selectedServer, setSelectedServer] = useState(SERVERS[0].id);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedServer, setSelectedServer] = useState<ServerId>(SERVERS[0].id);
+  const [lastTarget, setLastTarget] = useState<string>("");
 
-  const handleTrace = async (target: string) => {
+  /**
+   * Handles trace execution with error handling
+   * Memoized to prevent unnecessary re-renders
+   */
+  const handleTrace = useCallback(async (target: string) => {
     setIsLoading(true);
-    // Simulate network request with the selected server
-    setTimeout(() => {
-      const data = mockTrace(target, selectedServer);
+    setError(null);
+    setLastTarget(target);
+
+    try {
+      // TODO: Replace with actual API call when backend is ready
+      // const response = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.trace}`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ target, serverId: selectedServer }),
+      // });
+      // if (!response.ok) throw new Error('Trace failed');
+      // const data = await response.json();
+
+      // Simulate network request with the selected server
+      await new Promise((resolve) => setTimeout(resolve, TIMING.mockDelay));
+
+      const data = generateMockTrace(target, selectedServer);
       setResults(data);
+      toast.success(`Trace completed successfully for ${target}`);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to execute trace";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Trace error:", err);
+    } finally {
       setIsLoading(false);
-    }, 2000);
-  };
+    }
+  }, [selectedServer]);
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <h1 className="text-4xl font-bold mb-8">MTR Monitoring</h1>
-        
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold">MTR Monitoring</h1>
+          <p className="text-muted-foreground">
+            Network diagnostics tool to analyze latency and packet loss across network hops
+          </p>
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle>New Trace</CardTitle>
@@ -65,9 +75,10 @@ const Index = () => {
               <div className="w-full sm:w-48">
                 <Select
                   value={selectedServer}
-                  onValueChange={setSelectedServer}
+                  onValueChange={(value) => setSelectedServer(value as ServerId)}
+                  disabled={isLoading}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger aria-label="Select server location">
                     <SelectValue placeholder="Select server" />
                   </SelectTrigger>
                   <SelectContent>
@@ -86,11 +97,20 @@ const Index = () => {
           </CardContent>
         </Card>
 
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         {results.length > 0 && (
           <>
             <Card>
               <CardHeader>
-                <CardTitle>Latency Overview</CardTitle>
+                <CardTitle>
+                  Latency Overview
+                  {lastTarget && <span className="text-sm font-normal text-muted-foreground ml-2">({lastTarget})</span>}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <LatencyChart hops={results} />

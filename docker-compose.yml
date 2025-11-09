@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Frontend application
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mtr-monitoring-frontend
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - mtr-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Backend service (placeholder - implement your MTR backend here)
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: mtr-monitoring-backend
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=production
+  #   restart: unless-stopped
+  #   networks:
+  #     - mtr-network
+  #   # Required capabilities for running MTR command
+  #   cap_add:
+  #     - NET_RAW
+  #     - NET_ADMIN
+
+networks:
+  mtr-network:
+    driver: bridge
+
+# Optional: Add volumes for persistent data
+# volumes:
+#   mtr-data:

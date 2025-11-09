@@ -2,21 +2,29 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { validateTarget } from "@/lib/validation";
 
 interface MtrFormProps {
   onSubmit: (target: string) => void;
   isLoading: boolean;
 }
 
+/**
+ * Form component for initiating MTR trace requests
+ * Validates input for valid hostnames and IP addresses
+ */
 const MtrForm = ({ onSubmit, isLoading }: MtrFormProps) => {
   const [target, setTarget] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!target.trim()) {
-      toast.error("Please enter a target host or IP");
+
+    const validation = validateTarget(target);
+    if (!validation.valid) {
+      toast.error(validation.error);
       return;
     }
+
     onSubmit(target.trim());
   };
 
@@ -26,9 +34,10 @@ const MtrForm = ({ onSubmit, isLoading }: MtrFormProps) => {
         type="text"
         value={target}
         onChange={(e) => setTarget(e.target.value)}
-        placeholder="Enter host or IP (e.g., google.com)"
+        placeholder="Enter host or IP (e.g., google.com or 8.8.8.8)"
         className="flex-1"
         disabled={isLoading}
+        aria-label="Target host or IP address"
       />
       <Button type="submit" disabled={isLoading}>
         {isLoading ? "Tracing..." : "Start Trace"}
